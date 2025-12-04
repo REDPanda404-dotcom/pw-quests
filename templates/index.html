@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>База квестов Perfect World (ПК) 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 min-h-screen text-white">
+    <!-- Звездный фон -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute w-full h-full bg-[url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"20\" cy=\"20\" r=\"1\" fill=\"%23ffd700\" opacity=\"0.6\"><animate attributeName=\"r\" values=\"1;1.5;1\" dur=\"3s\" repeatCount=\"indefinite\"/></circle><circle cx=\"80\" cy=\"30\" r=\"0.8\" fill=\"%23ff6b6b\" opacity=\"0.5\"><animate attributeName=\"r\" values=\"0.8;1.2;0.8\" dur=\"4s\" repeatCount=\"indefinite\"/></circle></svg>')]"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Заголовок -->
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse mb-4">
+                <i class="fas fa-dragon mr-4"></i>База квестов PW 2025
+            </h1>
+            <p class="text-xl text-blue-200 opacity-80">Актуальные гайды и координаты NPC. Все серверы!</p>
+        </div>
+
+        <!-- Поиск -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 mb-12 shadow-2xl border border-white/20">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input name="search" value="{{ search }}" placeholder="🔍 Название квеста..." 
+                       class="p-4 rounded-2xl bg-white/20 border border-white/30 text-white placeholder-blue-200 focus:outline-none focus:ring-4 ring-yellow-500/50">
+                
+                <select name="level" class="p-4 rounded-2xl bg-white/20 border border-white/30 text-white">
+                    <option value="">Все уровни</option>
+                    <option value="1-19" {% if level_filter == '1-19' %}selected{% endif %}>1-19 lvl</option>
+                    <option value="20+" {% if level_filter == '20+' %}selected{% endif %}>20+ lvl</option>
+                    <option value="daily" {% if level_filter == 'daily' %}selected{% endif %}>Ежедневные</option>
+                </select>
+                
+                <select name="type" class="p-4 rounded-2xl bg-white/20 border border-white/30 text-white">
+                    <option value="">Все расы</option>
+                    <option value="human" {% if type_filter == 'human' %}selected{% endif %}>Люди</option>
+                    <option value="elf" {% if type_filter == 'elf' %}selected{% endif %}>Сиды</option>
+                </select>
+                
+                <button type="submit" class="p-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl font-bold text-lg shadow-xl hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-search mr-2"></i>Найти квесты
+                </button>
+            </form>
+        </div>
+
+        <!-- Квесты -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {% for quest in quests.items %}
+            <div class="group bg-white/10 backdrop-blur-xl rounded-3xl p-8 hover:bg-white/20 border border-white/20 hover:border-yellow-400/50 transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl">
+                <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-2xl font-bold text-yellow-400 group-hover:text-white transition-colors">{{ quest.title }}</h3>
+                    <span class="px-3 py-1 bg-gradient-to-r from-red-500 to-orange-500 text-xs font-bold rounded-full">
+                        {{ quest.difficulty }}/5
+                    </span>
+                </div>
+                <p class="text-blue-200 mb-4 leading-relaxed">{{ quest.description }}</p>
+                
+                {% if quest.npc_coords %}
+                <div class="flex items-center text-sm text-green-300 mb-4">
+                    <i class="fas fa-map-marker-alt mr-2 text-green-400"></i>
+                    {{ quest.npc_coords }}
+                </div>
+                {% endif %}
+                
+                {% if quest.link %}
+                <a href="{{ quest.link }}" target="_blank" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300">
+                    <i class="fas fa-external-link-alt mr-2"></i>Подробнее
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if quests.has_prev or quests.has_next %}
+        <div class="flex justify-center gap-4">
+            {% if quests.has_prev %}
+            <a href="?page={{ quests.prev_num }}{% if search %}&search={{ search }}{% endif %}{% if level_filter %}&level={{ level_filter }}{% endif %}" 
+               class="px-6 py-3 bg-white/20 rounded-2xl hover:bg-white/40 transition-all">← Назад</a>
+            {% endif %}
+            
+            <span class="px-6 py-3 bg-yellow-500/30 rounded-2xl font-bold">
+                Страница {{ quests.page }} из {{ quests.pages }}
+            </span>
+            
+            {% if quests.has_next %}
+            <a href="?page={{ quests.next_num }}{% if search %}&search={{ search }}{% endif %}{% if level_filter %}&level={{ level_filter }}{% endif %}" 
+               class="px-6 py-3 bg-white/20 rounded-2xl hover:bg-white/40 transition-all">Вперед →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Футер -->
+        <div class="text-center mt-16 p-8 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10">
+            <p class="text-blue-300">✅ Проверено 03.12.2025: <a href="https://www.pwdatabase.com/ru/search_quest" target="_blank" class="text-yellow-400 hover:underline">pwdatabase.com</a> и <a href="https://pwdata.ru/?page_id=362" target="_blank" class="text-yellow-400 hover:underline">pwdata.ru</a> работают!</p>
+            <p class="text-sm text-blue-400 mt-2">Все квесты для Perfect World PC | Tailwind CSS + Flask + SQLite</p>
+        </div>
+    </div>
+</body>
+</html>
